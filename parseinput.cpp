@@ -42,10 +42,10 @@ std::deque<connectiontable_t> create_table(OperatorType type, int degree){
    return tablelist;
 }
 
-void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int substlevel) {
-    std::deque<connectiontable_t> tablelist{ create_table( operatorlist, type, substlevel) };
+void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int degree, int substlevel) {
+    std::deque<connectiontable_t> tablelist{ create_table( type, substlevel) };
     for ( auto& entry : tablelist ) {
-	operatorlist.push_back( Vertex(name, type, substlevel, entry );
+	operatorlist.push_back( Vertex(name, type, substlevel, entry ) );
     }
 }
 
@@ -78,27 +78,26 @@ std::deque<Vertex> parse_input(std::string inputstr) {
 	operatorlist.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
     }
     
-    // Create vertices for physical operators
+    // Create vertices for physical & cluster operators
     //
     for (auto& entry : inputlist){
 	if ( entry == "Fn" ) {
-	    std::cout << "Found Fn!" << '\n';
-	    std::deque<connectiontable_t> tablelist{ create_table( OperatorType::physical, 1 ) };
-	    for ( auto& entry : tablelist ) 
-		operatorlist.push_back( Vertex("Fn", OperatorType::physical, 1, entry ) );
+		append_operator( operatorlist, entry, OperatorType::physical,1 ,1 );
 	}
-    }
-    for (auto& entry : inputlist){
-	if ( entry == "Vn" ) {
-	    std::cout << "Found Fn!" << '\n';
-	    std::deque<connectiontable_t> tablelist{ create_table( OperatorType::physical, 1 ) };
-	    for ( auto& entry : tablelist ) 
-		operatorlist.push_back( Vertex("Fn", OperatorType::physical, 1, entry ) );
+	else if ( entry == "Vn" ) {
+		append_operator( operatorlist, entry, OperatorType::physical,2, 2 );
+	}
+	else if ( entry[0] == 'T' ) {
+	    int degree{ static_cast<int>(entry[1]) - 48 };
+	    if ( entry.size() >= 4 ) {
+		substlevel = degree * (static_cast<int>(entry[3]) - 48) ;
+	    }
+	    append_operator (operatorlist, entry, OperatorType::cluster, degree, substlevel );
 	}
     }
     
-    for (auto& i : operatorlist)
-	std::cout << i ;
-    std::cout << '\n';
+//    for (auto& i : operatorlist)
+//	std::cout << i ;
+//	std::cout << '\n';
     return operatorlist;
 }

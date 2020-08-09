@@ -1,5 +1,5 @@
 #include "vertex.h"
-#include "inputparser.h"
+#include "parseinput.h"
 #include <iostream>
 #include <string>
 #include <deque>
@@ -11,6 +11,6 @@ int main(){
     std::deque<std::string> inputlist;
     std::cout << "Please Enter Substitution level followed by operator sequence:" << '\n';
     std::getline(std::cin, input);
-    inputparser(input);
+    parse_input(input);
     return 0;
 }
