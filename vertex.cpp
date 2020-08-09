@@ -7,16 +7,24 @@ std::string Vertex::getname() const {
     return m_name;
 }
 
+std::pair<int,int> Vertex::get_creation() const {
+    return std::make_pair( m_edgetable[0][0], m_edgetable[0][1] );
+}
+
+std::pair<int,int> Vertex::get_annihilation() const {
+    return std::make_pair( m_edgetable[1][0], m_edgetable[1][1] );
+}
+
 int Vertex::rank() const{
     return ( ( m_edgetable[0][0] + m_edgetable[0][1] ) - ( m_edgetable[1][0] + m_edgetable[1][1] ) );
 }
 
 std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
-    out << std::setw(6) << vertex.m_name ;
-    out << std::setw(6) << "| " << vertex.m_edgetable[0][0] << " "
-	<< vertex.m_edgetable[0][1] << " |" << '\n';
-    out << std::setw(12) << "| " << vertex.m_edgetable[1][0] << " "
-	<< vertex.m_edgetable[1][1] << " |" << '\n';
-
+//   out << std::setw(6) << vertex.m_name ;
+//    out << std::setw(6) << "| " << vertex.m_edgetable[0][0] << " "
+//	<< vertex.m_edgetable[0][1] << " |" << '\n';
+//    out << std::setw(12) << "| " << vertex.m_edgetable[1][0] << " "
+//	<< vertex.m_edgetable[1][1] << " |" << '\n';
+    out << vertex.m_name ;
     return out;
 }

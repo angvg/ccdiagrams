@@ -71,10 +71,10 @@ std::deque<Vertex> parse_input(std::string inputstr) {
     int substlevel{ std::stoi( inputlist[0] ) };
     if ( substlevel > 0 ){
 	// Create particle annihilators
-	exttable = { { {substlevel,0},{0,0} } };
+	exttable = { { {0,0},{substlevel,0} } };
 	operatorlist.push_back( Vertex("A", OperatorType::external, 1, exttable ) );
 	// Create hole annihilators
-	exttable = { { {0,substlevel},{0,0} } };
+	exttable = { { {0,0},{0,substlevel} } };
 	operatorlist.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
     }
     

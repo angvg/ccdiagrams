@@ -12,5 +12,7 @@ class Edge{
     public:
 
 	Edge(Vertex* from, Vertex* to);
+	
+	friend std::ostream& operator<< (std::ostream& out, const Edge &edge);
 
 };

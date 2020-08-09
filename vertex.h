@@ -2,6 +2,7 @@
 
 #include <string>
 #include <array>
+#include <utility>
 #include <iomanip>
 
 
@@ -34,6 +35,10 @@ class Vertex{
     public:
 
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
+
+	std::pair<int,int> get_creation() const;
+
+	std::pair<int,int> get_annihilation() const;
 
 	std::string getname() const;
 
