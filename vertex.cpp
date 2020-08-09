@@ -12,10 +12,10 @@ int Vertex::rank() const{
 }
 
 std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
-    out << std::setw(5) << vertex.m_name ;
-    out << std::setw(10) << "| " << vertex.m_edgetable[0][0] << '\t' 
+    out << std::setw(3) << vertex.m_name ;
+    out << std::setw(6) << "| " << vertex.m_edgetable[0][0] << " "
 	<< vertex.m_edgetable[0][1] << " |" << '\n';
-    out << std::setw(15) << "| " << vertex.m_edgetable[1][0] << '\t'
+    out << std::setw(9) << "| " << vertex.m_edgetable[1][0] << " "
 	<< vertex.m_edgetable[1][1] << " |" << '\n';
 
     return out;

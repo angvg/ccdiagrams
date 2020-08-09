@@ -1,34 +1,26 @@
-#include "inputparser.h"
+#include "parseinput.h"
 
 using connectiontable_t = std::array<std::array<int, 2>,2>;
 
 // Slice input string at blank characters to reveive a list of operators.
-std::deque<std::string> sliceinput(std::string inputstr){
+std::deque<std::string> slice_input(std::string inputstr){
     std::deque<std::string> outlist;
     std::string current;
     inputstr += " ";
-    // std::cout << "Input string: " << inputstr << '\n';
     for (auto& i : inputstr){
-	// std::cout << "Current string iterator: " << i << '\n';
 	if ( std::isspace(i) != 0 ) {
-	    // std::cout << "Blank found." << '\n';
 	    outlist.push_back(current);
 	    current.clear();
 	    continue;
 	}
-	    // std:: cout << "Non-blank character found: " << i << '\n';
 	    current += i;
     }
-    // std::cout << "Printing outlist: " << '\n';
-    // for (auto& i : outlist)
-    //     std::cout << i << " ";
-    // std::cout << '\n';
     return outlist;
 }
 
 
 // Create the tables for in- and outgoing connections for the respective operator type
-std::deque<connectiontable_t> createtable(OperatorType type, int degree){
+std::deque<connectiontable_t> create_table(OperatorType type, int degree){
     std::deque<connectiontable_t> tablelist;
     connectiontable_t edgetable{ { {0,0},{0,0} } };  
    if ( type == OperatorType::cluster ){
@@ -43,18 +35,27 @@ std::deque<connectiontable_t> createtable(OperatorType type, int degree){
 	       edgetable[0][1] = j;
 	       edgetable[1][0] = degree-i;
 	       edgetable[1][1] = degree-j;
+	       tablelist.push_back(edgetable);
 	   }
        }
    }
    return tablelist;
 }
 
+void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int substlevel) {
+    std::deque<connectiontable_t> tablelist{ create_table( operatorlist, type, substlevel) };
+    for ( auto& entry : tablelist ) {
+	operatorlist.push_back( Vertex(name, type, substlevel, entry );
+    }
+}
 
-std::deque<Vertex> inputparser(std::string inputstr) {
+
+
+std::deque<Vertex> parse_input(std::string inputstr) {
 
     std::deque<Vertex> operatorlist;
     connectiontable_t exttable = { { {0,0},{0,0} } };
-    std::deque<std::string> inputlist{ sliceinput(inputstr) };
+    std::deque<std::string> inputlist{ slice_input(inputstr) };
     
     std::cout << "Inputlist: " << inputstr << '\n';
     std::cout << "Sliced list: ";
@@ -82,7 +83,15 @@ std::deque<Vertex> inputparser(std::string inputstr) {
     for (auto& entry : inputlist){
 	if ( entry == "Fn" ) {
 	    std::cout << "Found Fn!" << '\n';
-	    std::deque<connectiontable_t> tablelist{ createtable( OperatorType::physical, 1 ) };
+	    std::deque<connectiontable_t> tablelist{ create_table( OperatorType::physical, 1 ) };
+	    for ( auto& entry : tablelist ) 
+		operatorlist.push_back( Vertex("Fn", OperatorType::physical, 1, entry ) );
+	}
+    }
+    for (auto& entry : inputlist){
+	if ( entry == "Vn" ) {
+	    std::cout << "Found Fn!" << '\n';
+	    std::deque<connectiontable_t> tablelist{ create_table( OperatorType::physical, 1 ) };
 	    for ( auto& entry : tablelist ) 
 		operatorlist.push_back( Vertex("Fn", OperatorType::physical, 1, entry ) );
 	}

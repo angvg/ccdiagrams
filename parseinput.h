@@ -6,4 +6,4 @@
 #include <regex>
 #include "vertex.h"
 
-std::deque<Vertex> parse_input(std::string inputstr);
+std::deque<Vertex> inputparser(std::string inputstr);
