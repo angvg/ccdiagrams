@@ -3,8 +3,12 @@
 Vertex::Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable) :
     m_name{ name }, m_operatortype{ type }, m_degree{ degree }, m_edgetable{ edgetable } {}
 
-std::string Vertex::getname() const {
+std::string Vertex::get_name() const {
     return m_name;
+}
+
+OperatorType Vertex::get_operatortype() const {
+    return m_operatortype;
 }
 
 std::pair<int,int> Vertex::get_creation() const {

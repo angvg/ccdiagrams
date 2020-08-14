@@ -24,10 +24,6 @@ std::deque<Graph> create_graph(std::deque<Vertex> vertices) {
 	}
     }
 
-    std::cout << "Creation space out: ";
-    for ( auto& i : creation_space_in )
-	std::cout << *i;
-    std::cout << '\n';
     // Create all possible combinations of edges.
     // This is done by combining outgoing connections of creation with incoming of annihilation space and
     // outgoing connections of annihilation with incoming of creation space.

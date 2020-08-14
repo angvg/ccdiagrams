@@ -11,3 +11,16 @@ void Graph::append_vertex(const Vertex& vertex ) {
 void Graph::append_edge(const Edge& edge ) {
     m_edges.push_back( edge );
 }
+
+
+std::ostream& operator<< ( std::ostream &out, const Graph &graph ) {
+    out << "Graph ";
+    for ( auto& vertex : graph.m_vertices ) {
+	out << vertex << "{" << vertex.rank() << "} ";
+    }
+    out << '\n';
+    for ( auto& edge : graph.m_edges ) {
+	out << edge << '\n';
+    }
+    return out;
+};

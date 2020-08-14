@@ -18,4 +18,6 @@ class Graph {
 
 	void append_edge(const Edge& edge);
 
+	friend std::ostream& operator<< ( std::ostream &out, const Graph &graph );
+
 };

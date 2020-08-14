@@ -40,8 +40,12 @@ class Vertex{
 
 	std::pair<int,int> get_annihilation() const;
 
-	std::string getname() const;
+	std::string get_name() const;
 
+	OperatorType get_operatortype() const;
+	
+	// Rank here is double the value of excitation level. E.g. rank(T1) = 2, rank (Vn) = 4.
+	// This enables the handling of the rank with integers.
 	int rank() const;
 
 	friend std::ostream& operator<< (std::ostream &out, const Vertex &vertex);

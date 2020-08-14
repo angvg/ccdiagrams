@@ -42,6 +42,9 @@ std::deque<connectiontable_t> create_table(OperatorType type, int degree){
    return tablelist;
 }
 
+// Instantiates and appends an operator to the supplied operatorlist.
+// For physical operators, multiple instances for the differing fragemts are created
+// by calling create_table.
 void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int degree, int substlevel) {
     std::deque<connectiontable_t> tablelist{ create_table( type, substlevel) };
     for ( auto& entry : tablelist ) {
@@ -51,17 +54,12 @@ void append_operator(std::deque<Vertex>& operatorlist, std::string name, Operato
 
 
 
-std::deque<Vertex> parse_input(std::string inputstr) {
+std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr) {
 
+    std::map<OperatorType,std::deque<Vertex>> outmap;
     std::deque<Vertex> operatorlist;
     connectiontable_t exttable = { { {0,0},{0,0} } };
     std::deque<std::string> inputlist{ slice_input(inputstr) };
-    
-    std::cout << "Inputlist: " << inputstr << '\n';
-    std::cout << "Sliced list: ";
-    for (auto& i : inputlist)
-	std::cout << i << " ";
-    std::cout << '\n';
 
     // Create vertices for external lines
     //
@@ -77,17 +75,33 @@ std::deque<Vertex> parse_input(std::string inputstr) {
 	exttable = { { {0,0},{0,substlevel} } };
 	operatorlist.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
     }
+    outmap.insert( { OperatorType::external , operatorlist } );
+    operatorlist.clear();
+
     
-    // Create vertices for physical & cluster operators
-    //
+    // Create vertices for physical  operators
+    // Each physical operator receives its own deque, that contains all the
+    // possible fragments. The deque then is stored in the outmap.
+    // Should there ever be need for additional physical operators, here is the place to
+    // expand the input parsing function.
     for (auto& entry : inputlist){
 	if ( entry == "Fn" ) {
 		append_operator( operatorlist, entry, OperatorType::physical,1 ,1 );
+		outmap.insert( { OperatorType::physical, operatorlist } );
+		operatorlist.clear();
+
 	}
 	else if ( entry == "Vn" ) {
 		append_operator( operatorlist, entry, OperatorType::physical,2, 2 );
+		outmap.insert( { OperatorType::physical, operatorlist } );
+		operatorlist.clear();
 	}
-	else if ( entry[0] == 'T' ) {
+    }
+
+    // Create vertices for cluster operators. Since the fragments don't vary, we can just
+    // put them all in one deque and append it to the outmap.
+    for (auto& entry : inputlist ) {
+	if ( entry[0] == 'T' ) {
 	    int degree{ static_cast<int>(entry[1]) - 48 };
 	    if ( entry.size() >= 4 ) {
 		substlevel = degree * (static_cast<int>(entry[3]) - 48) ;
@@ -95,9 +109,10 @@ std::deque<Vertex> parse_input(std::string inputstr) {
 	    append_operator (operatorlist, entry, OperatorType::cluster, degree, substlevel );
 	}
     }
+    outmap.insert( { OperatorType::cluster, operatorlist } );
     
 //    for (auto& i : operatorlist)
 //	std::cout << i ;
 //	std::cout << '\n';
-    return operatorlist;
+    return outmap;
 }
