@@ -17,8 +17,13 @@ class Graph {
 	Graph(std::deque<Vertex> vertices, std::deque<Edge> edges);
 	
 	void append_vertex(const Vertex& vertex);
+	void append_vertices(const std::deque<Vertex>& vertices);
 
 	void append_edge(const Edge& edge);
+	void append_edges(const std::deque<Edge>& edges );
+
+	std::deque<Vertex> get_vertices() const;
+	std::deque<Edge> get_edges() const;
 	
 	void print_edges() const;
 

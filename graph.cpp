@@ -1,4 +1,5 @@
 #include "graph.h"
+#include <deque>
 
 Graph::Graph( Vertex vertex, std::deque<Edge> edges) :
     m_vertices{ {vertex} }, m_edges{ edges } {};
@@ -10,8 +11,25 @@ void Graph::append_vertex(const Vertex& vertex ) {
     m_vertices.push_back( vertex );
 }
 
+void Graph::append_vertices(const std::deque<Vertex>& vertices) {
+    for ( auto& vertex : vertices )
+	m_vertices.push_back( vertex );
+}
+
 void Graph::append_edge(const Edge& edge ) {
     m_edges.push_back( edge );
+}
+void Graph::append_edges(const std::deque<Edge>& edges ) {
+    for ( auto& edge : edges )
+    m_edges.push_back( edge );
+}
+
+std::deque<Vertex> Graph::get_vertices() const {
+    return m_vertices;
+}
+
+std::deque<Edge> Graph::get_edges() const {
+    return m_edges;
 }
 
 void Graph::print_edges() const {
