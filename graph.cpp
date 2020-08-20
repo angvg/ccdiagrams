@@ -37,6 +37,13 @@ void Graph::print_edges() const {
 	std::cout << edge;
 }
 
+Graph operator+ (const Graph &graph1, const Graph &graph2) {
+    Graph graph( graph1.get_vertices(), graph1.get_edges() );
+    graph.append_vertices( graph2.get_vertices() );
+    graph.append_edges( graph2.get_edges() );
+    return graph;
+}
+
 std::ostream& operator<< ( std::ostream &out, const Graph &graph ) {
     out << "Graph ";
     for ( auto& vertex : graph.m_vertices ) {

@@ -30,3 +30,5 @@ class Graph {
 	friend std::ostream& operator<< ( std::ostream &out, const Graph &graph );
 
 };
+
+Graph operator+ (const Graph &graph1, const Graph &graph2);
