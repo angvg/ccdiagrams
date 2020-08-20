@@ -33,13 +33,13 @@ std::deque<Edge> create_edges(const std::deque<Vertex> &vertices) {
     for ( auto& c_out : creation_space_out ) {
 	for ( auto& a_in : annihilation_space_in ) {
 	    if ( *c_out != *a_in )
-	    edgelist.push_back( Edge( c_out, a_in ) );
+	    edgelist.push_back( Edge( *c_out, *a_in ) );
 	}
     }
     for (auto & a_out : annihilation_space_out ) {
 	for ( auto& c_in : creation_space_in ) {
 	    if ( *c_in != *a_out )
-	    edgelist.push_back( Edge( a_out, c_in ) );
+	    edgelist.push_back( Edge( *a_out, *c_in ) );
 	}
     }
     return edgelist;
@@ -53,7 +53,7 @@ std::map<Vertex,std::deque<Edge>> basic_cluster_edges( const std::deque<Vertex> 
 	    // Collect all in- and outgoing edges
 	    std::deque<Edge> current_edges;
 	    for ( auto& edge : edges ) {
-		if ( *edge.from == vertex || *edge.to == vertex )
+		if ( edge.from == vertex || edge.to == vertex )
 		    current_edges.push_back( edge );
 	    }
 	    // Append to return map
@@ -72,9 +72,9 @@ std::map<Vertex,std::deque<Graph>> basic_cluster_fragments( const std::map<Verte
 	std::deque<Edge> incoming;
 	std::deque<Edge> outgoing;
 	for ( auto& edge : mapentry.second ) {
-	    if ( *edge.from == mapentry.first )
+	    if ( edge.from == mapentry.first )
 		outgoing.push_back( edge );
-	    else
+	    else if ( edge.to == mapentry.first )
 		incoming.push_back( edge );
 	}
 	// Create all combinations of incoming and outgoing edges
