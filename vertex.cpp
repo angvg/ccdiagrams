@@ -7,6 +7,10 @@ std::string Vertex::get_name() const {
     return m_name;
 }
 
+int Vertex::degree() const {
+    return m_degree;
+}
+
 OperatorType Vertex::get_operatortype() const {
     return m_operatortype;
 }
@@ -31,4 +35,23 @@ std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
 //	<< vertex.m_edgetable[1][1] << " |" << '\n';
     out << vertex.m_name ;
     return out;
+}
+
+bool operator< ( const Vertex &vertex1, const Vertex &vertex2 ) {
+    if ( ( vertex1.get_operatortype() == OperatorType::external || vertex1.get_operatortype() == OperatorType::physical ) && vertex2.get_operatortype() == OperatorType::cluster )
+	return true;
+    else if ( vertex1.get_operatortype() == OperatorType::external && vertex2.get_operatortype() == OperatorType::physical )
+	return true;
+    else if ( vertex1.get_operatortype() == OperatorType::cluster && vertex2.get_operatortype() == OperatorType::cluster ) 
+	return ( vertex1.degree() < vertex2.degree() );
+	//return ( vertex1.get_name() < vertex2.get_name() );
+    else
+	return false;
+}
+
+bool operator== ( const Vertex &vertex1, const Vertex &vertex2 ) {
+    return ( vertex1.get_name() == vertex2.get_name() );
+}
+bool operator!= ( const Vertex &vertex1, const Vertex &vertex2 ) {
+    return !( vertex1 == vertex2 );
 }

@@ -1,9 +1,10 @@
+EXECDIR = build
 SOURCESCXX = $(wildcard *.cpp)
 #SOURCESCXX := $(filter-out output.cpp, $(SOURCESCXX))
 #EXECUTABLES = ${SOURCESCXX:.cpp=}
 MAINS = main.o test.o
 OBJECTS = ${SOURCESCXX:.cpp=.o}
-OBJECTS := $(filter-out $(MAINS), $(OBJECTS))
+OBJECTS := $(addprefix $(EXECDIR)/,$(filter-out $(MAINS), $(OBJECTS)))
 FILENAME = dg
 
 CXX = g++
@@ -13,14 +14,17 @@ CXXFLAGS = -g -I. -Wall -Werror -std=c++1z
 
 all: main test
 
-main: main.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $@
+runtest: clean test
+	$(EXECDIR)/test
 
-test: test.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $@
+main: $(EXECDIR)/main.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
 
-%.o: %.cpp
+test: $(EXECDIR)/test.o $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
+
+$(EXECDIR)/%.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o ${MAINS:.o=}
+	rm -f $(addprefix $(EXECDIR)/,*.o ${MAINS:.o=})

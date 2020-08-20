@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <string>
 #include <array>
 #include <utility>
@@ -32,6 +33,7 @@ class Vertex{
 	*/ 
 	std::array<std::array<int,2>,2> m_edgetable;
 
+
     public:
 
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
@@ -42,6 +44,8 @@ class Vertex{
 
 	std::string get_name() const;
 
+	int degree() const;
+
 	OperatorType get_operatortype() const;
 	
 	// Rank here is double the value of excitation level. E.g. rank(T1) = 2, rank (Vn) = 4.
@@ -51,3 +55,6 @@ class Vertex{
 	friend std::ostream& operator<< (std::ostream &out, const Vertex &vertex);
 };
 
+bool operator<  ( const Vertex &vertex1, const Vertex &vertex2 );
+bool operator== ( const Vertex &vertex1, const Vertex &vertex2 );
+bool operator!= ( const Vertex &vertex1, const Vertex &vertex2 );
