@@ -10,16 +10,16 @@ std::deque<Edge> create_edges(const std::deque<Vertex> &vertices) {
     // Populate lists
     for ( auto vertex_pointer = vertices.begin() ; vertex_pointer != vertices.end() ; ++vertex_pointer ) {
 	// If in- or outgoing connections exist, append pointer to list.
-	if ( (*vertex_pointer).get_creation().first != 0 ) {
+	if ( (*vertex_pointer).get_connection(0,0) != 0 ) {
 	    creation_space_in.push_back( { &(*vertex_pointer) } );
 	}
-	if ( (*vertex_pointer).get_creation().second != 0 ) {
+	if ( (*vertex_pointer).get_connection(0,1) != 0 ) {
 	    creation_space_out.push_back( { &(*vertex_pointer) } );
 	}
-	if ( (*vertex_pointer).get_annihilation().first != 0 ) {
+	if ( (*vertex_pointer).get_connection(1,0) != 0 ) {
 	    annihilation_space_in.push_back( { &(*vertex_pointer) } );
 	}
-	if ( (*vertex_pointer).get_annihilation().second != 0 ) {
+	if ( (*vertex_pointer).get_connection(1,1) != 0 ) {
 	    annihilation_space_out.push_back( { &(*vertex_pointer) } );
 	}
     }

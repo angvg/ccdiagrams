@@ -38,9 +38,19 @@ class Vertex{
 
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
 
-	std::pair<int,int> get_creation() const;
+	//std::pair<int,int> get_creation() const;
 
-	std::pair<int,int> get_annihilation() const;
+	//std::pair<int,int> get_annihilation() const;
+	
+	// space == false 	-> q-creation
+	// space == true  	-> q-annihilation
+	// direction == true 	-> in
+	// direction == false	-> out
+	int get_connection( bool space, bool direction ) const;
+	// Decreases the values in the edgetable up to 0.
+	// If a value would be decreased below 0, nothing is done and false is returned,
+	// otherwise true is returned.
+	bool decrease_connection(bool space, bool direction);
 
 	std::string get_name() const;
 
