@@ -32,14 +32,28 @@ std::deque<Edge> create_edges(const std::deque<Vertex> &vertices) {
 
     for ( auto& c_out : creation_space_out ) {
 	for ( auto& a_in : annihilation_space_in ) {
-	    if ( *c_out != *a_in )
-	    edgelist.push_back( Edge( *c_out, *a_in ) );
+	    if ( *c_out != *a_in ) {
+		Vertex v_from{ *c_out };
+		Vertex v_to{ *a_in };
+		v_from.clear_table();
+		v_from.set_connection( 0, 1, 1 );
+		v_to.clear_table();	
+		v_to.set_connection( 1 , 0, 1 );
+		edgelist.push_back( Edge( v_from, v_to ) );
+	    }
 	}
     }
     for (auto & a_out : annihilation_space_out ) {
 	for ( auto& c_in : creation_space_in ) {
-	    if ( *c_in != *a_out )
-	    edgelist.push_back( Edge( *a_out, *c_in ) );
+	    if ( *c_in != *a_out ) {
+		Vertex v_from{ *a_out};
+		Vertex v_to{ *c_in };
+		v_from.clear_table();
+		v_from.set_connection( 1, 1, 1 );
+		v_to.clear_table();	
+		v_to.set_connection( 0 , 0, 1 );
+		edgelist.push_back( Edge( v_from, v_to ) );
+	    }
 	}
     }
     return edgelist;
