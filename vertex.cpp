@@ -46,6 +46,16 @@ bool Vertex::decrease_connection(bool space, bool direction) {
 }
 
 
+void Vertex::set_connection( bool space, bool direction, int value ) { 
+    m_edgetable[space][direction] = value;
+}
+
+
+void Vertex::clear_table() {
+    m_edgetable.fill( 0 );
+}
+
+
 std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
 //   out << std::setw(6) << vertex.m_name ;
 //    out << std::setw(6) << "| " << vertex.m_edgetable[0][0] << " "

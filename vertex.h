@@ -51,6 +51,10 @@ class Vertex{
 	// If a value would be decreased below 0, nothing is done and false is returned,
 	// otherwise true is returned.
 	bool decrease_connection(bool space, bool direction);
+	// Sets a field in the edgetable to a specific value.
+	void set_connection( bool space, bool direction, int value );
+
+	void clear_table();
 
 	std::string get_name() const;
 
