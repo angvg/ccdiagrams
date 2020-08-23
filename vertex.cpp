@@ -52,7 +52,8 @@ void Vertex::set_connection( bool space, bool direction, int value ) {
 
 
 void Vertex::clear_table() {
-    m_edgetable.fill( 0 );
+    m_edgetable[0].fill( 0 );
+    m_edgetable[1].fill( 0 );
 }
 
 
