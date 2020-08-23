@@ -57,6 +57,17 @@ void Vertex::clear_table() {
 }
 
 
+Vertex& Vertex::operator+= ( const Vertex& rhs ) {
+    assert( this->m_operatortype == rhs.get_operatortype()
+	    && "Vertex: Operator += can only by applied to vertices of the same type." );
+   m_edgetable[0][0] += rhs.get_connection( 0,0 ); 
+   m_edgetable[0][1] += rhs.get_connection( 0,1 ); 
+   m_edgetable[1][0] += rhs.get_connection( 1,0 ); 
+   m_edgetable[1][1] += rhs.get_connection( 1,1 ); 
+   return *this;
+}
+
+
 std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
 //   out << std::setw(6) << vertex.m_name ;
 //    out << std::setw(6) << "| " << vertex.m_edgetable[0][0] << " "

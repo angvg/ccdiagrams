@@ -5,6 +5,7 @@
 #include <array>
 #include <utility>
 #include <iomanip>
+#include <cassert>
 
 
 enum class OperatorType{
@@ -65,6 +66,8 @@ class Vertex{
 	// Rank here is double the value of excitation level. E.g. rank(T1) = 2, rank (Vn) = 4.
 	// This enables the handling of the rank with integers.
 	int rank() const;
+
+	Vertex& operator+= ( const Vertex& rhs );
 
 	friend std::ostream& operator<< (std::ostream &out, const Vertex &vertex);
 };
