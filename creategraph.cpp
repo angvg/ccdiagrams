@@ -104,6 +104,45 @@ std::map<Vertex,std::deque<Graph>> basic_cluster_fragments( const std::map<Verte
 }
 
 
+std::tuple<Graph, std::set<Vertex>,bool> join_graphs( 
+	const Graph &lhs_graph, const Graph &rhs_graph, const std::set<Vertex> &remaining_vertices )
+{
+	    // A list of vertices, whose edge_table resembles the connections that can still be formed.
+	    std::set<Vertex> new_remaining_vertices{ remaining_vertices };
+	    // From the above list, subtract the connections of lhs.
+	    for ( auto& lhs_vertex : lhs_graph.get_vertices() ) {
+		auto lhs_node = new_remaining_vertices.extract( lhs_vertex );
+		if ( !lhs_node.value().decrease_connection( lhs_vertex ) )
+		    return {lhs_graph,remaining_vertices,false};
+		new_remaining_vertices.insert( std::move( lhs_node ) );
+	    }
+	    // Moving on to the rhs. We need to check if we have open connections from the lhs left,
+	    // so we can join lhs and rhs.
+	    for ( auto& rhs_vertex : rhs_graph.get_vertices() ) {
+		auto rhs_node = new_remaining_vertices.extract( rhs_vertex );
+		if ( !rhs_node.value().decrease_connection( rhs_vertex ) )
+		    return {lhs_graph,remaining_vertices,false};
+		new_remaining_vertices.insert( std::move( rhs_node ) );	
+	    }
+	    // If we haven't returned by now, we're good to join the graphs.		
+	    Graph new_lhs_graph{ lhs_graph + rhs_graph };
+	    return { new_lhs_graph, new_remaining_vertices, true };
+}
+    
+std::deque<Graph> compound_cluster_fragments( std::deque<Graph> basic_fragments, const std::set<Vertex> &all_vertices ) {
+    std::deque<Graph> outgraphs;
+    auto frag_it{ basic_fragments.cbegin() };
+    for ( auto& lhs_fragment : basic_fragments ) {
+	std::deque<Graph> lhs_graphs{ {lhs_fragment} };
+	for ( ; frag_it != basic_fragments.cend() ; ++frag_it ) {
+	}
+    }
+    return outgraphs;
+}
+
+	    
+
+
 //Graph join_graphs(
 //
 //void create_graphs(std::deque<Graph> &final_graphs,std::deque<Graph> &current_graphs, std::list<Vertex*> vertices, std::list<Edge*> edges) {
