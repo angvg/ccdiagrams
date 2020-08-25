@@ -37,13 +37,30 @@ int Vertex::get_connection( bool space, bool direction ) const {
     return m_edgetable[space][direction];
 }
 
-bool Vertex::decrease_connection(bool space, bool direction) {
+bool Vertex::decrease_connection( bool space, bool direction ) {
     int& connection{ m_edgetable[space][direction] };
     if ( connection - 1 < 0 )
 	return false;
     --connection;
     return true;
 }
+bool Vertex::decrease_connection( bool space, bool direction, int value ) {
+    int& connection{ m_edgetable[space][direction] };
+    if ( connection - value < 0 )
+	return false;
+    connection -= value;
+    return true;
+}
+bool Vertex::decrease_connection( const Vertex &vertex ) {
+    for ( int m = 0 ; m <= 1 ; ++m ) {
+	for ( int n = 0 ; n <= 1 ; ++n ) {
+    if ( !(decrease_connection( m, n, vertex.get_connection( m,n ) ) ) )
+	return false;
+	}
+    }
+    return true;
+}
+
 
 
 void Vertex::set_connection( bool space, bool direction, int value ) { 
@@ -60,10 +77,10 @@ void Vertex::clear_table() {
 Vertex& Vertex::operator+= ( const Vertex& rhs ) {
     assert( this->m_operatortype == rhs.get_operatortype()
 	    && "Vertex: Operator += can only by applied to vertices of the same type." );
-   m_edgetable[0][0] += rhs.get_connection( 0,0 ); 
-   m_edgetable[0][1] += rhs.get_connection( 0,1 ); 
-   m_edgetable[1][0] += rhs.get_connection( 1,0 ); 
-   m_edgetable[1][1] += rhs.get_connection( 1,1 ); 
+   this->m_edgetable[0][0] += rhs.get_connection( 0,0 ); 
+   this->m_edgetable[0][1] += rhs.get_connection( 0,1 ); 
+   this->m_edgetable[1][0] += rhs.get_connection( 1,0 ); 
+   this->m_edgetable[1][1] += rhs.get_connection( 1,1 ); 
    return *this;
 }
 
