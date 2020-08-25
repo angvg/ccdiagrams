@@ -1,7 +1,7 @@
 #include "graph.h"
 #include <deque>
 
-void insert_or_increment( std::set<Vertex>& vertices, const Vertex& vertex );
+void insert_or_increment( std::set<Vertex>& vertices, const Edge& edge  );
 
 
 Graph::Graph( Vertex vertex, std::deque<Edge> edges) :
@@ -10,12 +10,7 @@ Graph::Graph(std::set<Vertex> vertices, std::deque<Edge> edges) :
     m_vertices{ vertices }, m_edges{ edges } {};
 Graph::Graph( std::deque<Edge> edges ) : m_edges{ edges } {
     for ( auto& edge : m_edges ) {
-	   insert_or_increment( m_vertices, edge.from ); 
-	   insert_or_increment( m_vertices, edge.to );
-		    //Vertex add_vertex = *result_from.first;	
-	    //add_vertex += edge.from;
-	    //m_vertices.erase( result_from.first );
-	    //m_vertices.insert( add_vertex );
+	   insert_or_increment( m_vertices, edge ); 
 	}
     };
 
@@ -31,10 +26,13 @@ Graph::Graph( std::deque<Edge> edges ) : m_edges{ edges } {
 
 void Graph::append_edge(const Edge& edge ) {
     m_edges.push_back( edge );
+    insert_or_increment( m_vertices, edge );
 }
-void Graph::append_edges(const std::deque<Edge>& edges ) {
-    for ( auto& edge : edges )
+void Graph::append_edge(const std::deque<Edge>& edges ) {
+    for ( auto& edge : edges ) {
     m_edges.push_back( edge );
+    insert_or_increment( m_vertices, edge );
+    }
 }
 
 std::set<Vertex> Graph::get_vertices() const {
@@ -70,11 +68,17 @@ std::ostream& operator<< ( std::ostream &out, const Graph &graph ) {
 };
 
 
-void insert_or_increment( std::set<Vertex>& vertices, const Vertex& vertex ) {
-    auto result = vertices.insert( vertex );
+void insert_or_increment( std::set<Vertex>& vertices, const Edge& edge ) {
+    auto result = vertices.insert( edge.from );
     if ( !result.second ) {
 	auto node = vertices.extract( result.first );
-	node.value() += vertex;
+	node.value() += edge.from;
+	vertices.insert(std::move(node));
+    }
+    result = vertices.insert( edge.to );
+    if ( !result.second ) {
+	auto node = vertices.extract( result.first );
+	node.value() += edge.to;
 	vertices.insert(std::move(node));
     }
 }

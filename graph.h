@@ -25,7 +25,7 @@ class Graph {
 //	void append_vertices(const std::deque<Vertex>& vertices);
 
 	void append_edge(const Edge& edge);
-	void append_edges(const std::deque<Edge>& edges );
+	void append_edge(const std::deque<Edge>& edges );
 
 	std::set<Vertex> get_vertices() const;
 	std::deque<Edge> get_edges() const;
