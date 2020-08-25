@@ -8,7 +8,7 @@ OBJECTS := $(addprefix $(EXECDIR)/,$(filter-out $(MAINS), $(OBJECTS)))
 FILENAME = dg
 
 CXX = g++
-CXXFLAGS = -g -I. -Wall -Werror -std=c++1z
+CXXFLAGS = -g -I. -Wall -Werror -std=c++2a
 
 .PHONY: clean
 
