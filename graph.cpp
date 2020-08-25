@@ -1,24 +1,23 @@
 #include "graph.h"
 #include <deque>
 
+void insert_or_increment( std::set<Vertex>& vertices, const Vertex& vertex );
+
+
 Graph::Graph( Vertex vertex, std::deque<Edge> edges) :
     m_vertices{ {vertex} }, m_edges{ edges } {};
 Graph::Graph(std::set<Vertex> vertices, std::deque<Edge> edges) :
     m_vertices{ vertices }, m_edges{ edges } {};
 Graph::Graph( std::deque<Edge> edges ) : m_edges{ edges } {
     for ( auto& edge : m_edges ) {
-	auto result_from = m_vertices.insert( edge.from );
-	if ( !result_from.second ) {
-	    auto node = m_vertices.extract( result_from.first );
-	    node.value() += edge.from;
-	    m_vertices.insert(std::move(node));
-	    //Vertex add_vertex = *result_from.first;	
+	   insert_or_increment( m_vertices, edge.from ); 
+	   insert_or_increment( m_vertices, edge.to );
+		    //Vertex add_vertex = *result_from.first;	
 	    //add_vertex += edge.from;
 	    //m_vertices.erase( result_from.first );
 	    //m_vertices.insert( add_vertex );
 	}
-    }
-};
+    };
 
 
 //void Graph::append_vertex(const Vertex& vertex ) {
@@ -69,3 +68,13 @@ std::ostream& operator<< ( std::ostream &out, const Graph &graph ) {
     }
     return out;
 };
+
+
+void insert_or_increment( std::set<Vertex>& vertices, const Vertex& vertex ) {
+    auto result = vertices.insert( vertex );
+    if ( !result.second ) {
+	auto node = vertices.extract( result.first );
+	node.value() += vertex;
+	vertices.insert(std::move(node));
+    }
+}
