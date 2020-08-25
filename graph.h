@@ -36,4 +36,4 @@ class Graph {
 
 };
 
-//Graph operator+ (const Graph &graph1, const Graph &graph2);
+Graph operator+ ( const Graph &lhs_graph, const Graph &rhs_graph);
