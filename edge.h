@@ -25,6 +25,7 @@ class Edge{
 
 	Vertex get_from() const;
 	Vertex get_to() const;
+	LineType get_type() const;
 	
 	friend std::ostream& operator<< (std::ostream& out, const Edge &edge);
 
