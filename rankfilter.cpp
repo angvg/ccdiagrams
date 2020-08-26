@@ -40,8 +40,8 @@ std::deque<std::set<Vertex>> rank_filter( std::map<OperatorType,std::deque<Verte
     int externalrank{ 0 };
     int clusterrank { 0 };
     std::deque<std::set<Vertex>> unique_combinations;
-    std::set<Vertex>> externallist;
-    std::set<Vertex>> clusterlist;
+    std::set<Vertex> externallist;
+    std::set<Vertex> clusterlist;
 
     // Create all possible combinations of physical operator fragments.
     // Populate external & cluster list and keep track of rank
@@ -81,7 +81,7 @@ std::deque<std::set<Vertex>> rank_filter( std::map<OperatorType,std::deque<Verte
 		tmpset.insert( *vertex );
 	    for ( auto& vertex : clusterlist )
 		tmpset.insert( vertex );
-	    unique_combinations.push_back( tmpqueue );
+	    unique_combinations.push_back( tmpset );
 	}
     }
 

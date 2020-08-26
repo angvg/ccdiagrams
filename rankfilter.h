@@ -3,6 +3,7 @@
 #include "vertex.h"
 #include <deque>
 #include <map>
+#include <set>
 
 /// Creates a queue for each unique combination of (physical) operators that can survive according to rank.
 /**
