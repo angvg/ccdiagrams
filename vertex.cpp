@@ -97,13 +97,18 @@ std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
 
 
 bool operator< ( const Vertex &vertex1, const Vertex &vertex2 ) {
-    if ( ( vertex1.get_operatortype() == OperatorType::external || vertex1.get_operatortype() == OperatorType::physical ) && vertex2.get_operatortype() == OperatorType::cluster )
+    if ( vertex1.get_operatortype() == vertex2.get_operatortype() )
+	return ( vertex1.get_name() < vertex2.get_name() );
+    else if ( ( vertex1.get_operatortype() == OperatorType::external || vertex1.get_operatortype() == OperatorType::physical ) && vertex2.get_operatortype() == OperatorType::cluster )
 	return true;
     else if ( vertex1.get_operatortype() == OperatorType::external && vertex2.get_operatortype() == OperatorType::physical )
 	return true;
-    else if ( vertex1.get_operatortype() == OperatorType::cluster && vertex2.get_operatortype() == OperatorType::cluster ) 
-	return ( vertex1.degree() < vertex2.degree() );
-	//return ( vertex1.get_name() < vertex2.get_name() );
+    else if ( vertex1.get_operatortype() == OperatorType::cluster && vertex2.get_operatortype() == OperatorType::cluster ) {
+	if ( vertex1.degree() == vertex2.degree() )
+	    return ( vertex1.get_name() < vertex2.get_name() );
+	else
+	    return ( vertex1.degree() < vertex2.degree() );
+    }
     else
 	return false;
 }
