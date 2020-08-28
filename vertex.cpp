@@ -1,5 +1,7 @@
 #include "vertex.h"
 
+Vertex::Vertex(std::string name, OperatorType type ) :
+    m_name{ name }, m_operatortype{ type } {}
 Vertex::Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable) :
     m_name{ name }, m_operatortype{ type }, m_degree{ degree }, m_edgetable{ edgetable } {}
 
@@ -74,6 +76,10 @@ void Vertex::clear_table() {
 }
 
 
+void Vertex::print_table() const {
+    std::cout << "[" << m_edgetable[0][0] << m_edgetable[0][1] << m_edgetable[1][0] << m_edgetable[1][1] << "]" ;
+}
+
 Vertex& Vertex::operator+= ( const Vertex& rhs ) {
     assert( this->m_operatortype == rhs.get_operatortype()
 	    && "Vertex: Operator += can only by applied to vertices of the same type." );
@@ -97,20 +103,16 @@ std::ostream& operator<< (std::ostream &out, const Vertex &vertex){
 
 
 bool operator< ( const Vertex &vertex1, const Vertex &vertex2 ) {
-    if ( vertex1.get_operatortype() == vertex2.get_operatortype() )
-	return ( vertex1.get_name() < vertex2.get_name() );
-    else if ( ( vertex1.get_operatortype() == OperatorType::external || vertex1.get_operatortype() == OperatorType::physical ) && vertex2.get_operatortype() == OperatorType::cluster )
-	return true;
-    else if ( vertex1.get_operatortype() == OperatorType::external && vertex2.get_operatortype() == OperatorType::physical )
-	return true;
-    else if ( vertex1.get_operatortype() == OperatorType::cluster && vertex2.get_operatortype() == OperatorType::cluster ) {
+    if ( vertex1.get_operatortype() == OperatorType::cluster && vertex2.get_operatortype() == OperatorType::cluster ) {
 	if ( vertex1.degree() == vertex2.degree() )
 	    return ( vertex1.get_name() < vertex2.get_name() );
 	else
 	    return ( vertex1.degree() < vertex2.degree() );
     }
+    else if ( vertex1.get_operatortype() == vertex2.get_operatortype() )
+	return ( vertex1.get_name() < vertex2.get_name() );
     else
-	return false;
+	return ( vertex1.get_operatortype() < vertex2.get_operatortype() );
 }
 
 bool operator== ( const Vertex &vertex1, const Vertex &vertex2 ) {

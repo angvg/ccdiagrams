@@ -4,14 +4,16 @@
 #include <string>
 #include <array>
 #include <utility>
+#include <iostream>
 #include <iomanip>
 #include <cassert>
 
 
-enum class OperatorType{
+enum OperatorType{
     external,
     physical,
-    cluster
+    cluster,
+    residual
 };
 
 class Vertex{
@@ -21,7 +23,7 @@ class Vertex{
 	const std::string m_name;	
 	const OperatorType m_operatortype;
 	// The degree of T1 = 1, T2 = 2, Fn = 1, Vn = 2 , ...
-	const int m_degree;
+	const int m_degree{0};
 	/*
 	   This table stores the number of in- and outgoing connections 
 	   of the operator and has the form m_edgetable[QSPACE][IN/OUT].
@@ -37,6 +39,7 @@ class Vertex{
 
     public:
 
+	Vertex(std::string name, OperatorType type );
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
 
 	//std::pair<int,int> get_creation() const;
@@ -68,6 +71,8 @@ class Vertex{
 	// Rank here is double the value of excitation level. E.g. rank(T1) = 2, rank (Vn) = 4.
 	// This enables the handling of the rank with integers.
 	int rank() const;
+	
+	void print_table() const;
 
 	Vertex& operator+= ( const Vertex& rhs );
 
