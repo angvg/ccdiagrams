@@ -68,16 +68,28 @@ std::ostream& operator<< ( std::ostream &out, const Graph &graph ) {
 
 
 void insert_or_increment( std::set<Vertex>& vertices, const Edge& edge ) {
-    auto result = vertices.insert( edge.from );
+    Vertex from{ edge.get_from() };
+    from.clear_table();
+    if ( edge.get_type() == LineType::particle ) 
+	from.set_connection( 0,1,1 );
+    else 
+	from.set_connection( 1,1,1 );
+    auto result = vertices.insert( from );
     if ( !result.second ) {
 	auto node = vertices.extract( result.first );
-	node.value() += edge.from;
+	node.value() += from;
 	vertices.insert(std::move(node));
     }
-    result = vertices.insert( edge.to );
+    Vertex to{ edge.get_to() };
+    to.clear_table();
+    if ( edge.get_type() == LineType::particle )
+	to.set_connection( 1,0,1 );
+    else
+	to.set_connection( 0,0,1 );
+    result = vertices.insert( to );
     if ( !result.second ) {
 	auto node = vertices.extract( result.first );
-	node.value() += edge.to;
+	node.value() += to;
 	vertices.insert(std::move(node));
     }
 }
