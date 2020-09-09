@@ -1,30 +1,58 @@
-EXECDIR = build
+EXECDIR = app
 SOURCESCXX = $(wildcard *.cpp)
-#SOURCESCXX := $(filter-out output.cpp, $(SOURCESCXX))
-#EXECUTABLES = ${SOURCESCXX:.cpp=}
-MAINS = main.o test.o
-OBJECTS = ${SOURCESCXX:.cpp=.o}
-OBJECTS := $(addprefix $(EXECDIR)/,$(filter-out $(MAINS), $(OBJECTS)))
-FILENAME = dg
+
+MAINS = creatediagrams.o demo.o
+
+OBJDIR = build
+OBJECTS = $(SOURCESCXX:.cpp=.o)
+OBJECTS := $(addprefix $(OBJDIR)/,$(filter-out $(MAINS), $(OBJECTS)))
+
+DOTDIR = dot
+PDFDIR = diagrams
+DOTFILES = $(wildcard $(DOTDIR)/*.dot)
+PDFFILES = $(DOTFILES:.dot=.pdf)
+PDFFILES := $(subst $(DOTDIR),$(PDFDIR),$(PDFFILES))
 
 CXX = g++
-CXXFLAGS = -g -I. -Wall -Werror -std=c++2a
+CXXFLAGS = -g -Wall -Werror -std=c++2a -I.
 
-.PHONY: clean
+.PHONY: clean remrender remdot
 
-all: main test
+all: main  
 
-runtest: clean test
-	$(EXECDIR)/test
+demorun: demo | remrender remdot
+	$(EXECDIR)/demo
 
-main: $(EXECDIR)/main.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
+main: $(OBJDIR)/creatediagrams.o $(OBJECTS) | $(EXECDIR) $(DOTDIR)
+	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $(EXECDIR)/ccdg
 
-test: $(EXECDIR)/test.o $(OBJECTS)
-	$(CXX) $(CXXFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
+demo: $(OBJDIR)/demo.o $(OBJECTS) | $(EXECDIR) $(DOTDIR)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
 
-$(EXECDIR)/%.o: %.cpp
+$(OBJDIR)/%.o: %.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
+render: $(PDFFILES)
+
+$(OBJDIR):
+	mkdir $(OBJDIR)
+
+$(DOTDIR):
+	mkdir $(DOTDIR)
+
+$(PDFDIR)/%.pdf: $(DOTDIR)/%.dot | $(PDFDIR)
+	dot $< -Tpdf -o $@
+
+$(PDFDIR):
+	mkdir $(PDFDIR)
+
+$(EXECDIR):
+	mkdir $(EXECDIR)
+
 clean:
-	rm -f $(addprefix $(EXECDIR)/,*.o ${MAINS:.o=})
+	rm -f $(OBJDIR)/* $(EXECDIR)/* $(DOTDIR)/* $(PDFDIR)/*
+remrender:
+	rm -f $(PDFDIR)/*
+
+remdot:
+	rm -f $(DOTDIR)/*
