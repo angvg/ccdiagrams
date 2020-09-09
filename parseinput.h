@@ -7,6 +7,10 @@
 #include <regex>
 #include "vertex.h"
 
+
+/** \defgroup parseinput Input Parser 
+ * @{ */
+
 /// Parses the user-input string to deques of vertices.
 /** 
  * Input:
@@ -17,6 +21,6 @@
  * 	In addition each pysical operator has its own deque. This is because physical
  * 	operators can manifest in different fragments.
 */
-
-//std::deque<Vertex> parse_input(std::string inputstr);
 std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr);
+
+/** }@ */

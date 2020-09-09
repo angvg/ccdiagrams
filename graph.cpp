@@ -1,28 +1,18 @@
 #include "graph.h"
-#include <deque>
 
 void insert_or_increment( std::set<Vertex>& vertices, const Edge& edge  );
 
-
-Graph::Graph( Vertex vertex, std::deque<Edge> edges) :
-    m_vertices{ {vertex} }, m_edges{ edges } {};
-Graph::Graph(std::set<Vertex> vertices, std::deque<Edge> edges) :
-    m_vertices{ vertices }, m_edges{ edges } {};
+Graph::Graph() {};
+//Graph::Graph( Vertex vertex, std::deque<Edge> edges) :
+//    m_vertices{ {vertex} }, m_edges{ edges } {};
+//Graph::Graph(std::set<Vertex> vertices, std::deque<Edge> edges) :
+//    m_vertices{ vertices }, m_edges{ edges } {};
 Graph::Graph( std::deque<Edge> edges ) : m_edges{ edges } {
     for ( auto& edge : m_edges ) {
 	   insert_or_increment( m_vertices, edge ); 
 	}
     };
 
-
-//void Graph::append_vertex(const Vertex& vertex ) {
-//    m_vertices.push_back( vertex );
-//}
-
-//void Graph::append_vertices(const std::deque<Vertex>& vertices) {
-//    for ( auto& vertex : vertices )
-//	m_vertices.push_back( vertex );
-//}
 
 void Graph::append_edge(const Edge& edge ) {
     m_edges.push_back( edge );
@@ -41,6 +31,12 @@ std::set<Vertex> Graph::get_vertices() const {
 
 std::deque<Edge> Graph::get_edges() const {
     return m_edges;
+}
+
+void Graph::print_vertices() const {
+    for ( auto& vertex : m_vertices ) {
+	std::cout << vertex.get_name() << "{" << vertex.rank() << "}" ;
+    }
 }
 
 void Graph::print_edges() const {
@@ -92,4 +88,29 @@ void insert_or_increment( std::set<Vertex>& vertices, const Edge& edge ) {
 	node.value() += to;
 	vertices.insert(std::move(node));
     }
+}
+
+
+AdjacencyMatrix::AdjacencyMatrix( const Graph &graph ) {
+    // Set up matrix
+    const std::set<Vertex>& vertices{ graph.get_vertices() };
+    // Columns/from
+    for ( auto& v_col : vertices ) {
+	// Rows/to
+	std::map<Vertex, int> rows;
+	for ( auto& v_row : vertices )
+	    rows.insert( std::make_pair( v_row, 0 ) ); 
+	m_matrix.insert( std::make_pair( v_col, rows ) );
+    }
+
+    // Add connections (map values) based on the edges
+    const std::deque<Edge>& edges{ graph.get_edges() };
+    for ( auto& edge : edges ) {
+	m_matrix.at( edge.get_from() ).at( edge.get_to() ) += 1;
+    }
+}
+
+
+bool operator== ( const AdjacencyMatrix &lhs, const AdjacencyMatrix &rhs ) {
+    return ( lhs.m_matrix == rhs.m_matrix );
 }

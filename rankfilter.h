@@ -5,6 +5,9 @@
 #include <map>
 #include <set>
 
+/** \defgroup rankfilter Filter by Rank
+ * @{ */
+
 /// Creates a queue for each unique combination of (physical) operators that can survive according to rank.
 /**
  * Input
@@ -17,3 +20,5 @@
  *
  */
 std::deque<std::set<Vertex>> rank_filter( std::map<OperatorType,std::deque<Vertex>> vertexmap );
+
+/** }@ */

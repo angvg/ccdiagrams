@@ -2,7 +2,7 @@
 
 using connectiontable_t = std::array<std::array<int, 2>,2>;
 
-// Slice input string at blank characters to reveive a list of operators.
+// Slice input string at blank characters to receive a list of operators.
 std::deque<std::string> slice_input(std::string inputstr){
     std::deque<std::string> outlist;
     std::string current;
@@ -103,9 +103,10 @@ std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr) {
     for (auto& entry : inputlist ) {
 	if ( entry[0] == 'T' ) {
 	    int degree{ static_cast<int>(entry[1]) - 48 };
-	    if ( entry.size() >= 4 ) {
+	    if ( entry.size() >= 4 )
 		substlevel = degree * (static_cast<int>(entry[3]) - 48) ;
-	    }
+	    else
+		substlevel = degree;
 	    append_operator (operatorlist, entry, OperatorType::cluster, degree, substlevel );
 	}
     }
