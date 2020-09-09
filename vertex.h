@@ -12,8 +12,7 @@
 enum OperatorType{
     external,
     physical,
-    cluster,
-    residual
+    cluster
 };
 
 class Vertex{
@@ -26,7 +25,7 @@ class Vertex{
 	const int m_degree{0};
 	/*
 	   This table stores the number of in- and outgoing connections 
-	   of the operator and has the form m_edgetable[QSPACE][IN/OUT].
+	   of the operator and has the form m_connectiontable[QSPACE][IN/OUT].
 
 	   Example T1:
 			   |  in  out
@@ -34,17 +33,15 @@ class Vertex{
 	   q-creation      |   1   1
 	   q-annihilation  |   0   0
 	*/ 
-	std::array<std::array<int,2>,2> m_edgetable;
+	std::array<std::array<int,2>,2> m_connectiontable;
 
 
     public:
 
 	Vertex(std::string name, OperatorType type );
+	Vertex(std::string name, OperatorType type, int degree );
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
 
-	//std::pair<int,int> get_creation() const;
-
-	//std::pair<int,int> get_annihilation() const;
 	
 	// space == false 	-> q-creation
 	// space == true  	-> q-annihilation
@@ -60,10 +57,16 @@ class Vertex{
 	// Sets a field in the edgetable to a specific value.
 	void set_connection( bool space, bool direction, int value );
 
+	// Returns false, if all connections in the table are 0.
+	bool connections() const;
+
+	// Sets all entries in connectiontable to 0.
 	void clear_table();
 
 	std::string get_name() const;
 
+	// The degree is determined by the number of creater/annihilator pairs.
+	// E.g. T1: 1, T2: 2, T1^2: 2 , ...
 	int degree() const;
 
 	OperatorType get_operatortype() const;
