@@ -18,9 +18,41 @@ std::deque<std::string> slice_input(std::string inputstr){
     return outlist;
 }
 
+// Create sum from sliced input
+Sum<Vertex> create_sum( std::deque<std::string> sliced_input )
+{
+    Sum<Vertex> s_out;
+    Product<Vertex> p_out;
+    // Create vertices for external lines
+    //
+    // Assert that the first entry is a number
+    connectiontable_t exttable = { { {0,0},{0,0} } };
+    assert(std::regex_match(sliced_input[0], std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"))
+		&& "Invalid Input: first entry not a number");
+    int substlevel{ std::stoi( sliced_input[0] ) };
+    if ( substlevel > 0 ){
+	// Create particle annihilators
+	exttable = { { {0,0},{substlevel,0} } };
+	p_out.push_back( Vertex("A", OperatorType::external, 1, exttable ) );
+	// Create hole annihilators
+	exttable = { { {0,0},{0,substlevel} } };
+	p_out.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
+    }
+    
+    // Append physical and cluster operators
+    auto it_queue{ sliced_input.begin() };
+    ++it_queue;
+    for ( ; it_queue != sliced_input.end() ; ++it_queue ) {
+	p_out.push_back( { *it_queue } );
+    }
+    s_out.push_back( p_out );
+    return s_out;
+}
+
 
 // Create the tables for in- and outgoing connections for the respective operator type
-std::deque<connectiontable_t> create_table(OperatorType type, int degree){
+std::deque<connectiontable_t> create_table(OperatorType type, int degree)
+{
     std::deque<connectiontable_t> tablelist;
     connectiontable_t edgetable{ { {0,0},{0,0} } };  
    if ( type == OperatorType::cluster ){
@@ -45,7 +77,8 @@ std::deque<connectiontable_t> create_table(OperatorType type, int degree){
 // Instantiates and appends an operator to the supplied operatorlist.
 // For physical operators, multiple instances for the differing fragemts are created
 // by calling create_table.
-void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int degree, int substlevel) {
+void append_operator(std::deque<Vertex>& operatorlist, std::string name, OperatorType type, int degree, int substlevel)
+{
     std::deque<connectiontable_t> tablelist{ create_table( type, substlevel) };
     for ( auto& entry : tablelist ) {
 	operatorlist.push_back( Vertex(name, type, substlevel, entry ) );
@@ -54,8 +87,8 @@ void append_operator(std::deque<Vertex>& operatorlist, std::string name, Operato
 
 
 
-std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr) {
-
+std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr)
+{
     std::map<OperatorType,std::deque<Vertex>> outmap;
     std::deque<Vertex> operatorlist;
     connectiontable_t exttable = { { {0,0},{0,0} } };
