@@ -1,64 +1,137 @@
-#include "vertex.h"
-#include "edge.h"
+#include "bch.h"
 #include "parseinput.h"
-#include "creategraph.h"
 #include "rankfilter.h"
+#include "graph.h"
+#include "creategraph.h"
 #include "createdot.h"
-#include <iostream>
-#include <string>
 #include <deque>
-#include <map>
+#include <ios>
+#include <iostream>
+#include <algorithm>
+#include <string>
 
-int main(){
 
-    std::string inputstr;
-    std::cout << '\n' << "Enter reference determinant substitution level followed by operator sequence:" << '\n';
-    std::cout << '\t' << "Substitution level: positive integer" << '\n';
-    std::cout << '\t' << "Physical Operators: Fn Vn " << '\n';
-    std::cout << '\t' << "Cluster Operators: T1 T2 T1^2 ... " << '\n';
-    std::cout << "Sequence: " ;
-    std::getline(std::cin, inputstr);
+int main() {
 
-    // Parse input, create a list for each operator and each type of physical operator fragment.
-    std::map<OperatorType,std::deque<Vertex>> parsed_map{ parse_input( inputstr ) };
+
+    std::cout << "To generate CC energy and amplitude equations please enter truncation levels." << '\n';
+    std::cout << "(Available options: \"S\", \"D\", \"T\", \"Q\", \"SD\", \"SDT\" , ... )" << '\n';
+
+    std::string str_input;
+    std::getline( std::cin, str_input );
     
-    // Filter physical operator vertices out according to rank.
-    std::deque<std::set<Vertex>> filtered_by_rank{ rank_filter( parsed_map ) };
-    if ( filtered_by_rank.empty() ) {
-	std::cout << "No nonzero expression possible according to rank!";
-	return 0;
+    std::vector<CCTruncation> truncation;
+    for ( auto& character : str_input ) {
+	if ( character == 'S' )
+	    truncation.push_back( CCTruncation::S );
+	else if ( character == 'D' )
+	    truncation.push_back( CCTruncation::D );
+	else if ( character == 'T' )
+	    truncation.push_back( CCTruncation::T );
+	else if ( character == 'Q' )
+	    truncation.push_back( CCTruncation::Q );
+    }
+    std::sort( truncation.begin(), truncation.end(), []( CCTruncation lhs, CCTruncation rhs ){ return lhs < rhs; } );
+
+
+    
+    Sum<Vertex> s_bch( bch_expansion( truncation ) );
+    
+    std::cout << "..." << '\n' << "Generating BCH-expansion of Hn = Fn + Vn for CC" << str_input << " :" << '\n';
+    std::cout << s_bch << '\n' << "..." << '\n';
+
+    std::deque<Sum<Vertex>> cc_equations;
+    cc_equations.push_back( s_bch );
+    for ( auto& t : truncation ) {
+	Sum<Vertex> s_tmp_bch{ s_bch };	
+	s_tmp_bch.mulitply_left( create_product( t + 1 ) );
+	cc_equations.push_back( s_tmp_bch );
+    }
+    
+    std::deque<std::deque<std::map<OperatorType,std::deque<Vertex>>>> parsed;
+    for ( auto& equation : cc_equations ) {
+	std::deque<std::map<OperatorType,std::deque<Vertex>>> parsed_equation;
+	for ( auto& product : equation ) {
+	    parsed_equation.push_back( parse_input( product ) );
+	}
+	parsed.push_back( parsed_equation );
     }
 
-    // Create graphs for each different physical operator fragment.
-    std::deque<std::deque<Graph>> final_graphs;
-    for ( auto& graphs : filtered_by_rank )
-	final_graphs.push_back( create_graphs( graphs ) );
-
-
-    std::cout << '\n' << "Coupled Cluster Diagrams for: " << inputstr << '\n';
-    int fragm_ctr = 1;
-    for ( auto graphs : final_graphs ) {
-	std::cout << '\t' << "Diagrams for " << fragm_ctr << ". combination of physical operator fragments:" << '\n';
-	int dgrm_ctr{1};
-	for ( auto& graph : graphs ) {
-	    std::cout << '\t' << dgrm_ctr << " - " ;
-	    graph.print_edges();
-	    ++dgrm_ctr;
+    std::deque<std::deque<std::deque<std::set<Vertex>>>> filtered_by_rank;
+    for ( auto& equation : parsed ) {
+	std::deque<std::deque<std::set<Vertex>>> filtered_equation;
+	for ( auto& entry : equation ) {
+	    filtered_equation.push_back( rank_filter( entry ) );
 	}
-	std::cout << '\n';
-	++fragm_ctr;
+	filtered_by_rank.push_back( filtered_equation );
+    }
+
+    std::deque<std::deque<Graph>> final_graphs;
+    // For every cc equation
+    for ( auto& equation : filtered_by_rank ) {
+	std::deque<Graph> final_equation;
+	// For every product in the bch-series
+	for ( auto& bch_product : equation ) {
+	    // For every combination of physical operator fragments
+	    for ( auto& phys_comb : bch_product ) {
+		std::deque<Graph> all_graphs{ create_graphs( phys_comb ) };
+		//std::deque<Graph> duplicates_removed{ remove_duplicates ( all_graphs ) };
+		std::deque<Graph> disconnected_removed{ remove_disconnected( all_graphs ) };
+		for ( auto& graph : disconnected_removed )
+		    final_equation.push_back( graph );
+	    }
+	}
+	final_graphs.push_back( final_equation );
+    }
+
+    // Remove duplicates
+    std::deque<std::deque<Graph>> duplicates_removed;
+    for ( auto& equation : final_graphs ) {
+	duplicates_removed.push_back( remove_duplicates( equation ) );
+    }
+
+    
+    // Print
+
+    auto it_equation{ duplicates_removed.cbegin() };
+    std::cout << "Diagrams for CC" << str_input << "-energy equation (total "
+	<< it_equation->size() << "):" << '\n' << '\n';
+    for ( auto& graph : *it_equation ) {
+		std::cout << '\t' << "Diagram for: "; graph.print_vertices();
+		std::cout << '\n' << '\t' << '\t' ;
+		graph.print_edges();
+		std::cout << '\n';
     }
     std::cout << '\n';
+    
+    ++it_equation;
+    int input_ctr{0};
+    
+    for ( ; it_equation != duplicates_removed.cend() ; ++it_equation, ++input_ctr ) {
+    std::cout << "Diagrams for CC" << str_input << "-amplitude equation: " << str_input.at(input_ctr) 
+	<< " - excitation (total " << it_equation->size() << ")" << '\n' << '\n';
+	for ( auto& graph : *it_equation ) {
+		    std::cout << '\t' << "Diagram for: "; graph.print_vertices();
+		    std::cout << '\n' << '\t' << '\t';
+		    graph.print_edges();
+		    std::cout << '\n';
+	}
+	std::cout << '\n';
+    }
+    std::cout << '\n';
+    
 
-    // Create .dot files
-    std::string filename;
-    fragm_ctr = 1;
-    for ( auto& graphs : final_graphs ) {
-	filename = "dot/diagrams_" + std::to_string(fragm_ctr) + ".dot";
-	create_dot( graphs, filename );
-	std::cout << "Graph written to: " << filename << '\n';
-	++fragm_ctr;
+    auto it_dot{ duplicates_removed.cbegin() };
+    create_dot( *it_dot, "dot/0_Energy.dot" );
+    std::cout << "Created .dot file: dot/0_Energy.dot" << '\n'; 
+    ++it_dot;
+
+    int dotctr{1};
+    for ( ; it_dot != duplicates_removed.cend() ; ++it_dot, ++dotctr ) {
+	std::string filename = "dot/" + std::to_string( dotctr ) + "_Amplitude_" + str_input.at( dotctr - 1) + ".dot";
+	create_dot( *it_dot, filename );
+	std::cout << "Created .dot file: " << filename << '\n'; 
     }
 
-   return 0;
+    return 0;
 }
