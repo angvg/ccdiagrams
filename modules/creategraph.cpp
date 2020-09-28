@@ -120,9 +120,16 @@ std::map<Vertex,std::deque<std::pair<Graph, std::set<Vertex>>>> basic_cluster_fr
 	const std::map<Vertex,std::deque<Edge>> &vertexedges, const std::set<Vertex> &all_vertices )
 {
     std::map<Vertex,std::deque<std::pair<Graph, std::set<Vertex>>>> fragment_map;
+    // If there are no cluster vertices, we need to create fragments of physical operators as well
+    //bool no_cluster{false};
+    bool no_cluster{true};
+    for ( auto& mapentry : vertexedges ) {
+	if ( mapentry.first.get_operatortype() == OperatorType::cluster )
+	    no_cluster = false;
+    }
     // Iterate over all vertices
     for ( auto& mapentry : vertexedges ) {
-	if ( mapentry.first.get_operatortype() == OperatorType::cluster ) {
+	if ( (mapentry.first.get_operatortype() == OperatorType::cluster) || no_cluster ) {
 	    // Sort edges in incoming and outgoing
 	    std::deque<Edge> incoming;
 	    std::deque<Edge> outgoing;
@@ -144,6 +151,8 @@ std::map<Vertex,std::deque<std::pair<Graph, std::set<Vertex>>>> basic_cluster_fr
 	    }
 	    fragment_map.insert( {mapentry.first,graphlist} );
 	}
+	if ( no_cluster )
+	    continue;
 	// For phsical operators just create a graph for each remaining edge
 	else if ( mapentry.first.get_operatortype() == OperatorType::physical ) {
 	    if ( mapentry.second.empty() )
@@ -219,8 +228,9 @@ std::deque<std::pair<Graph, std::set<Vertex>>> complete_cluster_combinations(
     // Splits the degree in even (combine fragment with itself) or odd (add a basic fragment to the combined) combinations.
     std::stack<bool> divisible_by_two;
     int degree{ cluster.degree() };
-    if ( (cluster.get_operatortype() == OperatorType::physical) && (basic_fragments.size() < 2) )
-	degree = 1;
+    //if ( (cluster.get_operatortype() == OperatorType::physical) && (basic_fragments.size() < 2) )
+    //if (  (basic_fragments.size() < 2) )
+    //	return basic_fragments;
     if ( degree == 1 )
 	return basic_fragments;
     while ( degree > 2 ) {	
@@ -332,11 +342,16 @@ std::deque<Graph> create_graphs( const std::set<Vertex> &vertices )
     // with the leftovers from the physical operator fragments. External operators can be ignored, since they
     // either have to contract with cluster- or physical operators or they wont yield a valid graph.
     auto it_complete_fragments{ complete_fragments.crbegin() };
-    std::deque<std::pair<Graph, std::set<Vertex>>> complete_pairs{ it_complete_fragments->second };
-    ++it_complete_fragments;
-    for ( ; it_complete_fragments != complete_fragments.crend() ; ++it_complete_fragments ) {
-	complete_pairs = asymmetric_combinations( complete_pairs, it_complete_fragments->second );
+    std::deque<std::pair<Graph, std::set<Vertex>>> complete_pairs;
+    if ( !( it_complete_fragments == complete_fragments.crend() ) ) {
+	complete_pairs = it_complete_fragments->second ;
+	++it_complete_fragments;
+	for ( ; it_complete_fragments != complete_fragments.crend() ; ++it_complete_fragments ) {
+	    complete_pairs = asymmetric_combinations( complete_pairs, it_complete_fragments->second );
+	    
+	}
     }
+    
 
     // Lastly, we have to discard incomplete graphs, i.e. those graphs, whose associated vertices (in the pair,
     // not the member) still have open connections ( their edge_table entries != 0).
@@ -353,9 +368,9 @@ std::deque<Graph> create_graphs( const std::set<Vertex> &vertices )
 	    complete_graphs.push_back( complete_pair.first );
     }
 
-    std::deque<Graph> duplicates_removed{ remove_duplicates( complete_graphs ) };
+    //std::deque<Graph> duplicates_removed{ remove_duplicates( complete_graphs ) };
 
-    std::deque<Graph> disconnected_removed{ remove_disconnected ( duplicates_removed ) };
+    //std::deque<Graph> disconnected_removed{ remove_disconnected ( duplicates_removed ) };
 
     return complete_graphs;
 }
