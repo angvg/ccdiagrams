@@ -132,6 +132,7 @@ int main() {
 	create_dot( *it_dot, filename );
 	std::cout << "Created .dot file: " << filename << '\n'; 
     }
+    std::cout << "For graphical rendering use \"make render\" (graphviz install required)." << '\n'; 
 
     return 0;
 }
