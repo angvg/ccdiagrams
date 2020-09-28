@@ -1,5 +1,7 @@
 #include "vertex.h"
 
+//Vertex::Vertex(std::string name ) :
+//    m_name{ name } {}
 Vertex::Vertex(std::string name, OperatorType type ) :
     m_name{ name }, m_operatortype{ type } {}
 Vertex::Vertex(std::string name, OperatorType type, int degree ) :
@@ -12,6 +14,15 @@ std::string Vertex::get_name() const {
     return m_name;
 }
 
+
+std::string Vertex::get_name_html() const {
+    std::string str_out{ m_name.substr(0,1) };
+    if ( m_name.size() > 1 )
+	str_out.append( "<SUB>" + m_name.substr(1,1) + "</SUB>" );
+    if ( m_name.size() > 3 )
+	str_out.append( "<SUP>" + m_name.substr(3,1) + "</SUP>" );
+    return str_out;
+}
 
 int Vertex::degree() const {
     return m_degree;
@@ -82,6 +93,12 @@ void Vertex::clear_table() {
 
 void Vertex::print_table() const {
     std::cout << "[" << m_connectiontable[0][0] << m_connectiontable[0][1] << m_connectiontable[1][0] << m_connectiontable[1][1] << "]" ;
+}
+
+Vertex Vertex::operator= ( const Vertex& vertex ) {
+    Vertex cp_vertex( vertex.get_name(), vertex.get_operatortype(), vertex.degree(), vertex.m_connectiontable );
+    
+    return cp_vertex;
 }
 
 Vertex& Vertex::operator+= ( const Vertex& rhs ) {

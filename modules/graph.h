@@ -36,6 +36,9 @@ class Graph {
 
 	std::set<Vertex> get_vertices() const;
 	std::deque<Edge> get_edges() const;
+
+	std::string vertices() const;
+	std::string vertices_html() const;
 	
 	void print_vertices() const;
 	void print_edges() const;

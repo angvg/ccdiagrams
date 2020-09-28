@@ -12,7 +12,8 @@
 enum OperatorType{
     external,
     physical,
-    cluster
+    cluster,
+    undefined
 };
 
 class Vertex{
@@ -38,6 +39,7 @@ class Vertex{
 
     public:
 
+	//Vertex(std::string name );
 	Vertex(std::string name, OperatorType type );
 	Vertex(std::string name, OperatorType type, int degree );
 	Vertex(std::string name, OperatorType type, int degree, std::array<std::array<int,2>,2> edgetable);
@@ -64,6 +66,7 @@ class Vertex{
 	void clear_table();
 
 	std::string get_name() const;
+	std::string get_name_html() const;
 
 	// The degree is determined by the number of creater/annihilator pairs.
 	// E.g. T1: 1, T2: 2, T1^2: 2 , ...
@@ -76,6 +79,8 @@ class Vertex{
 	int rank() const;
 	
 	void print_table() const;
+
+	Vertex operator= ( const Vertex& vertex );
 
 	Vertex& operator+= ( const Vertex& rhs );
 

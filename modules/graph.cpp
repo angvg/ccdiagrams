@@ -33,6 +33,22 @@ std::deque<Edge> Graph::get_edges() const {
     return m_edges;
 }
 
+std::string Graph::vertices() const {
+    std::string vertices;
+    for ( auto vertex : m_vertices ) {
+	vertices.append( vertex.get_name() );
+    }
+    return vertices;
+}
+
+std::string Graph::vertices_html() const {
+    std::string vertices;
+    for ( auto vertex : m_vertices ) {
+	vertices.append( vertex.get_name_html() );
+    }
+    return vertices;
+}
+
 void Graph::print_vertices() const {
     for ( auto& vertex : m_vertices ) {
 	std::cout << vertex.get_name() << "{" << vertex.rank() << "}" ;
