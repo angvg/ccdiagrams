@@ -13,6 +13,10 @@ int main(){
 
     
 std::deque<std::string> inputstrings{
+	"1 Fn",
+	"2 Vn",
+	"Fn T1",
+	"1 T1 Fn T1"
 	"1 Fn T1^2",
 	"1 Vn T1 T2",
 	"2 Vn T1^2 T2",
@@ -25,8 +29,12 @@ int input_ctr{1};
     // For every inputstring
 for ( auto& inputstring : inputstrings ) {
 
+    std::deque<std::string> sliced_input{ slice_input( inputstring ) };
+
+    Product<Vertex> input_product{ create_product( sliced_input ) };
+
     // Parse input, create a list for each operator and each type of physical operator fragment.
-    std::map<OperatorType,std::deque<Vertex>> parsed_map{ parse_input( inputstring ) };
+    std::map<OperatorType,std::deque<Vertex>> parsed_map{ parse_input( input_product ) };
     
     // Filter physical operator vertices out according to rank.
     std::deque<std::set<Vertex>> filtered_by_rank{ rank_filter( parsed_map ) };
@@ -103,12 +111,20 @@ for ( auto& inputstring : inputstrings ) {
     // Print to console
     std::cout << '\n';
 	std::cout << "Input string: " << '\n' << '\t' << inputstring << '\n';
+
+	std::cout << "Sliced Input: " << '\n' << '\t';
+	for ( auto& sliced : sliced_input ) {
+	    std::cout << sliced << " ";
+	}
+	std::cout << '\n';
+
 	std::cout << "Parsed Input: " << '\n' << '\t'; 
 	for ( auto& mapentry : parsed_map ) {
 	    for ( auto& parse_vertex : mapentry.second ) {
 		std::cout << parse_vertex << "{" << parse_vertex.rank() << "} ";
 	    }
 	}
+
 	int frgmt_ctr{1};
 	std::cout << '\n';
 	std::cout << "Input filtered by rank: " << '\n';
@@ -137,9 +153,9 @@ for ( auto& inputstring : inputstrings ) {
 		for ( auto& cluster_edge : mapentry.second ) { // iterate over edges in map value 
 		    std::cout << cluster_edge;
 		}
-		std::cout << ", ";
+		std::cout << '\n';
 	    }
-	    std::cout << '\n';
+	    //std::cout << '\n';
 	    ++frgmt_ctr;
 	}
 	frgmt_ctr = 1;

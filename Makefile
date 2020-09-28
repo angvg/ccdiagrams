@@ -4,14 +4,13 @@ OBJDIR = bin
 DOTDIR = dot
 PDFDIR = diagrams
 
-MAINS = creatediagrams.cpp demo.cpp
+MAINS = creatediagrams.cpp demo.cpp demo2.cpp
 
 SOURCESCXX = $(wildcard $(SOURCESDIR)/*.cpp)
 SOURCESCXX := $(filter-out $(addprefix $(SOURCESDIR)/, $(MAINS)), $(SOURCESCXX))
 
 OBJECTS = $(SOURCESCXX:.cpp=.o)
-OBJECTS := $(filter-out $(MAINS), $(OBJECTS))
-OBJECTS := $(patsubst $(SOURCESDIR)/%.cpp, $(OBJDIR)/%.o, $(filter-out $(MAINS), $(OBJECTS)))
+OBJECTS := $(patsubst $(SOURCESDIR)/%.o, $(OBJDIR)/%.o, $(OBJECTS))
 
 DOTFILES = $(wildcard $(DOTDIR)/*.dot)
 PDFFILES = $(DOTFILES:.dot=.pdf)
@@ -33,8 +32,6 @@ main: $(OBJDIR)/creatediagrams.o $(OBJECTS) | $(EXECDIR) $(DOTDIR)
 demo: $(OBJDIR)/demo.o $(OBJECTS) | $(EXECDIR) $(DOTDIR)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) $(OBJECTS) $< -o $(EXECDIR)/$@
 
-#$(OBJECTS): $(SOURCESCXX) | $(OBJDIR)
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
 $(OBJDIR)/%.o: $(SOURCESDIR)/%.cpp | $(OBJDIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

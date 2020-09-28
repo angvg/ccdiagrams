@@ -19,9 +19,8 @@ std::deque<std::string> slice_input(std::string inputstr){
 }
 
 // Create sum from sliced input
-Sum<Vertex> create_sum( std::deque<std::string> sliced_input )
+Product<Vertex> create_product( std::deque<std::string> sliced_input )
 {
-    Sum<Vertex> s_out;
     Product<Vertex> p_out;
     // Create vertices for external lines
     //
@@ -43,10 +42,25 @@ Sum<Vertex> create_sum( std::deque<std::string> sliced_input )
     auto it_queue{ sliced_input.begin() };
     ++it_queue;
     for ( ; it_queue != sliced_input.end() ; ++it_queue ) {
-	p_out.push_back( { *it_queue } );
+	p_out.push_back( { *it_queue, OperatorType::undefined } );
     }
-    s_out.push_back( p_out );
-    return s_out;
+    return p_out;
+}
+
+
+Product<Vertex> create_product( int substlevel )
+{
+    Product<Vertex> p_out;
+    connectiontable_t exttable = { { {0,0},{0,0} } };
+    if ( substlevel > 0 ){
+	// Create particle annihilators
+	exttable = { { {0,0},{substlevel,0} } };
+	p_out.push_back( Vertex("A", OperatorType::external, 1, exttable ) );
+	// Create hole annihilators
+	exttable = { { {0,0},{0,substlevel} } };
+	p_out.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
+    }
+    return p_out;
 }
 
 
@@ -87,26 +101,16 @@ void append_operator(std::deque<Vertex>& operatorlist, std::string name, Operato
 
 
 
-std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr)
+std::map<OperatorType,std::deque<Vertex>> parse_input( Product<Vertex>& input_product )
 {
     std::map<OperatorType,std::deque<Vertex>> outmap;
     std::deque<Vertex> operatorlist;
-    connectiontable_t exttable = { { {0,0},{0,0} } };
-    std::deque<std::string> inputlist{ slice_input(inputstr) };
 
     // Create vertices for external lines
-    //
-    // Assert that the first entry is a number
-    assert(std::regex_match(inputlist[0], std::regex("(\\+|-)?[0-9]*(\\.?([0-9]+))$"))
-		&& "Invalid Input: first entry not a number");
-    int substlevel{ std::stoi( inputlist[0] ) };
-    if ( substlevel > 0 ){
-	// Create particle annihilators
-	exttable = { { {0,0},{substlevel,0} } };
-	operatorlist.push_back( Vertex("A", OperatorType::external, 1, exttable ) );
-	// Create hole annihilators
-	exttable = { { {0,0},{0,substlevel} } };
-	operatorlist.push_back( Vertex("I", OperatorType::external, 1, exttable ) );
+    for ( auto& vertex : input_product ) {
+	if ( vertex.get_operatortype() == OperatorType::external ) {
+	    operatorlist.push_back( vertex );
+	}
     }
     outmap.insert( { OperatorType::external , operatorlist } );
     operatorlist.clear();
@@ -117,15 +121,14 @@ std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr)
     // possible fragments. The deque then is stored in the outmap.
     // Should there ever be need for additional physical operators, here is the place to
     // expand the input parsing function.
-    for (auto& entry : inputlist){
-	if ( entry == "Fn" ) {
-		append_operator( operatorlist, entry, OperatorType::physical,1 ,1 );
+    for (auto& vertex : input_product ){
+	if ( vertex.get_name() == "Fn" ) {
+		append_operator( operatorlist, vertex.get_name(), OperatorType::physical,1 ,1 );
 		outmap.insert( { OperatorType::physical, operatorlist } );
 		operatorlist.clear();
-
 	}
-	else if ( entry == "Vn" ) {
-		append_operator( operatorlist, entry, OperatorType::physical,2, 2 );
+	else if ( vertex.get_name() == "Vn" ) {
+		append_operator( operatorlist, vertex.get_name(), OperatorType::physical,2, 2 );
 		outmap.insert( { OperatorType::physical, operatorlist } );
 		operatorlist.clear();
 	}
@@ -133,14 +136,16 @@ std::map<OperatorType,std::deque<Vertex>> parse_input(std::string inputstr)
 
     // Create vertices for cluster operators. Since the fragments don't vary, we can just
     // put them all in one deque and append it to the outmap.
-    for (auto& entry : inputlist ) {
-	if ( entry[0] == 'T' ) {
-	    int degree{ static_cast<int>(entry[1]) - 48 };
-	    if ( entry.size() >= 4 )
-		substlevel = degree * (static_cast<int>(entry[3]) - 48) ;
+    int substlevel{0};
+    for (auto& vertex : input_product ) {
+	std::string name{ vertex.get_name() };
+	if ( name[0] == 'T' ) {
+	    int degree{ static_cast<int>(name[1]) - 48 };
+	    if ( name.size() >= 4 )
+		substlevel = degree * (static_cast<int>(name[3]) - 48) ;
 	    else
 		substlevel = degree;
-	    append_operator (operatorlist, entry, OperatorType::cluster, degree, substlevel );
+	    append_operator (operatorlist, name, OperatorType::cluster, degree, substlevel );
 	}
     }
     outmap.insert( { OperatorType::cluster, operatorlist } );

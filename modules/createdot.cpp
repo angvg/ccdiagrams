@@ -13,7 +13,12 @@ void create_dot( const std::deque<Graph> &graphs, std::string filename ) {
     outf << "edge [ arrowhead=normal, arrowsize=0.4 ] " << '\n';
 
     for ( auto& graph : graphs ) {
-	outf << "{" << '\n';
+
+	outf << '\t' << "subgraph cluster_" << graph_ctr << " {" << '\n';
+
+	outf << '\t' << "label = <" << graph.vertices_html() << ">;" << '\n';
+
+	outf << '\t' << "{" << '\n';
 
 	// Collect external vertices
 	outf << '\t' << "{ rank = source; ";	
@@ -30,7 +35,7 @@ void create_dot( const std::deque<Graph> &graphs, std::string filename ) {
 	for ( auto& vertex : graph.get_vertices() ) {
 	    if ( vertex.get_operatortype() == OperatorType::physical ) {
 		outf << "\"" << vertex << std::to_string(graph_ctr) << "\"" ;
-		outf << " [label=\"" << vertex.get_name() << "\"];" << '\n';
+		outf << " [label=<" << vertex.get_name_html() << ">];" << '\n';
 	    }
 	}
 	outf << " }" << '\n';	
@@ -41,10 +46,8 @@ void create_dot( const std::deque<Graph> &graphs, std::string filename ) {
 	    if ( vertex.get_operatortype() == OperatorType::cluster ) {
 		std::string str_cluster{ vertex.get_name() };
 		outf << "\"" << vertex << std::to_string(graph_ctr) << "\"";
-		outf << " [label=<" << str_cluster.substr(0,2) ; 
-		if ( str_cluster.size() > 2 ) 
-		    outf << "<SUP>" << str_cluster.substr(3,str_cluster.size()) << "</SUP>" ;
-		outf << ">];" << '\n';
+		outf << " [label=<" << vertex.get_name_html() << ">];" << '\n';
+		//outf << ">];" << '\n';
 	    }
 	}
 	outf << " }" << '\n';	
@@ -54,6 +57,7 @@ void create_dot( const std::deque<Graph> &graphs, std::string filename ) {
 		<< " -> " << "\"" << edge.get_to() << std::to_string(graph_ctr) << "\"" << ";" << '\n';
 	}
 
+	outf << '\t' << "}" << '\n';
 	outf << "}" << '\n';
 
 	++graph_ctr;
